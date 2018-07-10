@@ -49,6 +49,7 @@ This is my directory tree :
 |------playbooks/
 |---------install-docker.yml
 |---------install-registry.yml
+|---------install-etcd.yml
 |------certs/
 |---------domain.crt
 |---------domain.key
@@ -93,16 +94,57 @@ First, we want to create self-signed certificates with openssl :
 ```
 You'll obtain a domain.crt and a domain.key files.
 
-You can run the playbool with this command :
+You can run the playbook with this command :
 ```
 $ ansible-playbook -i hosts playbooks/install-registry.yml --ask-become-pass --ask-pass
 ```
 
 you can check on the master node if the registry is running :
 ```
+$ docker ps
 CONTAINER ID        IMAGE               COMMAND                  CREATED              STATUS              PORTS                            NAMES
 33e26b597327        registry:2          "/entrypoint.sh /etc…"   About a minute ago   Up About a minute   0.0.0.0:443->443/tcp, 5000/tcp   registryhttps
 
 $ curl -k https://172.20.10.2/v2/_catalog
 {"repositories":[]}
 ```
+
+# Install ETCD on master node
+
+We will take the Careos public image of ETCD.
+
+This is the command to pull and run the ETCD image thanks to a playbook ansible :
+```
+ansible-playbook playbooks/install-etcd.yml --ask-become-pass --ask-pass -i hosts
+```
+
+In order to check if the etcd is running, you can try :
+```
+$ docker ps
+CONTAINER ID        IMAGE                        COMMAND                  CREATED             STATUS              PORTS                                                                NAMES
+c2fa4716398a        quay.io/coreos/etcd:v2.3.8   "/etcd -name etcd0 -…"   2 minutes ago       Up 2 minutes        0.0.0.0:2379-2380->2379-2380/tcp, 0.0.0.0:4001->4001/tcp, 7001/tcp   etcd
+33e26b597327        registry:2                   "/entrypoint.sh /etc…"   2 hours ago         Up 2 hours          0.0.0.0:443->443/tcp, 5000/tcp                                       registryhttps
+
+$ curl http://172.20.10.2:2379/version
+{"etcdserver":"2.3.8","etcdcluster":"2.3.0"}
+```
+
+# Install Kubernetes cluster
+
+In order to create a Kubernetes cluster, you can use a docker image called hyperkube.
+
+### Pull Hyperkube image in the registry
+
+You can pull this image :
+```
+docker pull googlecontainer/hyperkube
+```
+Then you will run this image in order to deploy : 
+- kubelet
+- api-server
+- kube-scheduler
+- kube-controller
+
+### Install API Server
+
+
