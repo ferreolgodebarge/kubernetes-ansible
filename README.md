@@ -90,7 +90,7 @@ $ sudo docker ps
 
 First, we want to create self-signed certificates with openssl :
 ```
- openssl req -newkey rsa:2048 -nodes -keyout domain.key -x509 -days 365 -out domain.crt
+$ openssl req -newkey rsa:2048 -nodes -keyout domain.key -x509 -days 365 -out domain.crt
 ```
 You'll obtain a domain.crt and a domain.key files.
 
@@ -99,7 +99,7 @@ You can run the playbook with this command :
 $ ansible-playbook -i hosts playbooks/install-registry.yml --ask-become-pass --ask-pass
 ```
 
-you can check on the master node if the registry is running :
+You can check on the master node if the registry is running :
 ```
 $ docker ps
 CONTAINER ID        IMAGE               COMMAND                  CREATED              STATUS              PORTS                            NAMES
@@ -115,7 +115,7 @@ We will take the Careos public image of ETCD.
 
 This is the command to pull and run the ETCD image thanks to a playbook ansible :
 ```
-ansible-playbook playbooks/install-etcd.yml --ask-become-pass --ask-pass -i hosts
+$ ansible-playbook playbooks/install-etcd.yml --ask-become-pass --ask-pass -i hosts
 ```
 
 In order to check if the etcd is running, you can try :
@@ -135,15 +135,22 @@ In order to create a Kubernetes cluster, you can use a docker image called hyper
 
 ### Pull Hyperkube image in the registry
 
-You can pull this image :
+You can lauch the playbook pull-images.yml :
 ```
-docker pull googlecontainer/hyperkube
+$ ansible-playbook pull-images -i hosts --ask-pass --ask-become-pass
 ```
+
+You can verify it on the master node :
+```
+$ docker images | grep hyperkube
+k8s.gcr.io/hyperkube   v1.9.9              06696cbe4586        11 days ago         652MB
+```
+
 Then you will run this image in order to deploy : 
-- kubelet
-- api-server
-- kube-scheduler
-- kube-controller
+- kubelet (on worker node)
+- api-server (on master node)
+- kube-scheduler (on master node)
+- kube-controller (on master node)
 
 ### Install API Server
 

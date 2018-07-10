@@ -1,0 +1,6 @@
+---
+- hosts: master
+  tasks:
+  - name: pull hyperkube image
+    command: docker pull k8s.gcr.io/hyperkube:v1.9.9
+    become: true
