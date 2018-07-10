@@ -154,4 +154,6 @@ Then you will run this image in order to deploy :
 
 ### Install API Server
 
-
+```
+docker run --net=host -d --name=kube-apiserver --restart=always -v /var/run/kubernetes:/var/run/kubernetes -v /certs:/etc/ssl/cets k8s.gcr.io/hyperkube:v1.9.9 kube-apiserver --etcd-servers=http://172.20.10.2:2379 --service-cluster-ip-range=10.0.0.1/24 --insecure-port=8080 --secure-port 6443 --authorization-mode=RBAC
+```
