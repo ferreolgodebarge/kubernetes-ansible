@@ -1,0 +1,13 @@
+---
+- hosts: master
+  tasks:
+  - name: Copy certs on master
+    copy:
+      src: /home/ferreol/Documents/git/kubernetes-ansible/certs/
+      dest: /certs 
+    become: true
+
+  - name: Install registry docker v2 in https
+    command: docker run -d --restart=always --name registryhttps -v /certs:/certs -e REGISTRY_HTTP_ADDR=0.0.0.0:443 -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key -p 443:443 registry:2
+    become: true
+
